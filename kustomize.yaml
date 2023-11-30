@@ -1,0 +1,160 @@
+# Combined Kubernetes YAML file for Frontend, Backend, and MongoDB
+
+# Frontend Deployment and Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: jojojoda/sbclient:v4
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  externalIPs:
+    - 10.107.57.82
+  type: NodePort
+
+# Backend Deployment and Service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: jojojoda/sbserver:v4
+        ports:
+        - containerPort: 5000
+        env:
+          - name: SB_DATABASE_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: score-board-config
+                key: SB_DATABASE_HOST
+          - name: SB_DATABASE_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: score-board-config
+                key: SB_DATABASE_PORT
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: score-board-config
+  labels:
+    data: config
+data:
+  SB_DATABASE_PORT: "27017"
+  SB_DATABASE_HOST: "score-board-mongodb"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+  externalIPs:
+    - 10.107.57.85
+  type: NodePort
+---
+# Score Board MongoDB
+# --------------------
+# - StatefulSet containing the database
+# - Service to access
+# - Two persistentVolumeClaims/mounts: score-board-data and mongo-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: score-board-mongodb
+  labels:
+    app: score-board-mongodb
+spec:
+  ports:
+  - name: http
+    port: 27017
+    targetPort: 27017
+    protocol: TCP
+  selector:
+    app: score-board-mongodb
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: score-board-mongodb
+  labels:
+    app: score-board-mongodb
+spec:
+  serviceName: mongodb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: score-board-mongodb
+  template:
+    metadata:
+      labels:
+        app: score-board-mongodb
+    spec:
+      containers:
+      - name: score-board-mongodb
+        image: mongo
+        ports:
+        - containerPort: 27017
+          name: mongodb-port
+        volumeMounts:
+        - name: score-board-data
+          mountPath: /data/db
+        - name: mongo-config
+          mountPath: /data/configdb
+  volumeClaimTemplates:
+    - metadata:
+        name: score-board-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests: 
+            storage: 10Mi
+    - metadata:
+        name: mongo-config
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests: 
+            storage: 5Mi
