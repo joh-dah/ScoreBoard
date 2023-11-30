@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: jojojoda/sbclient:v4
+        image: jojojoda/sbclient:v6
         ports:
         - containerPort: 8080
 ---
@@ -54,7 +54,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: jojojoda/sbserver:v4
+        image: jojojoda/sbserver:v6
         ports:
         - containerPort: 5000
         env:

@@ -4,12 +4,19 @@
       <div class="col-md-12 text-center">
         <h3>Scores</h3>
         <div class="score">{{ score_1 }} : {{ score_2 }}</div>
-        <button class="btn btn-outline-primary fancy-button" @click="updateScore('score_1')">+</button>
-        <button class="btn btn-outline-primary fancy-button" @click="updateScore('score_2')">+</button>
+        <button class="btn btn-outline-primary fancy-button" @click="updateScore('score_1', 1)">+</button>
+        <button class="btn btn-outline-primary fancy-button" @click="updateScore('score_1', -1)">-</button>
+        <button class="btn btn-outline-primary fancy-button" @click="updateScore('score_2', 1)"
+          style="margin-left: 20px;">+</button>
+        <button class="btn btn-outline-primary fancy-button" @click="updateScore('score_2', -1)">-</button>
       </div>
+    </div>
+    <div class="row" style="margin-top: 20px;">
+      <button class="btn btn-outline-primary fancy-button" @click="endGame()">End Game</button>
     </div>
   </div>
 </template>
+
 
 
 <script>
@@ -20,26 +27,15 @@ export default {
     return {
       score_1: 0,
       score_2: 0,
-      game_id: 1,
+      gameId: this.$route.params.gameId,
     };
   },
   methods: {
-    initScore() {
-      const path = 'http://10.107.57.85:5000/scoreboard';
-      axios.post(path, {
-        score_1: 0,
-        score_2: 0,
-      })
-        .then((res) => {
-          this.game_id = res.data.game_id;
-          this.getScore();
-        })
-    },
     getScore() {
-      const path = 'http://10.107.57.85:5000/scoreboard';
+      const path = 'http://10.107.57.85:5000/games/' + this.gameId;
       axios.get(path, {
         params: {
-          game_id: this.game_id,
+          gameId: this.gameId,
         },
       })
         .then((res) => {
@@ -50,14 +46,15 @@ export default {
           console.error(error);
         });
     },
-    updateScore(team) {
-      const path = 'http://10.107.57.85:5000/scoreboard';
+    updateScore(team, value) {
+      const path = 'http://10.107.57.85:5000/games/' + this.gameId;
       const payload = {
         "score_1": this.score_1,
         "score_2": this.score_2,
-        "game_id": this.game_id,
+        "gameId": this.gameId,
       };
-      payload[team] += 1;
+      payload[team] += value;
+      payload[team] = Math.max(0, payload[team]);
       axios.put(path, payload)
         .then(() => {
           this.getScore();
@@ -67,9 +64,12 @@ export default {
           this.getScore();
         });
     },
+    endGame() {
+      this.$router.push({ name: 'games' });
+    },
   },
   created() {
-    this.initScore();
+    this.getScore();
   },
 };
 </script>
