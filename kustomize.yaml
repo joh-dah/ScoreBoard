@@ -93,12 +93,8 @@ spec:
   externalIPs:
     - 10.107.57.85
   type: NodePort
----
-# Score Board MongoDB
-# --------------------
-# - StatefulSet containing the database
-# - Service to access
-# - Two persistentVolumeClaims/mounts: score-board-data and mongo-config
+
+# MongoDB
 ---
 apiVersion: v1
 kind: Service
