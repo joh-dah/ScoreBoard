@@ -32,8 +32,7 @@ export default {
   },
   methods: {
     getScore() {
-      //const path = 'http://10.107.57.85:5000/scoreboard';
-      const path = 'http://localhost:5001/games/' + this.gameId;
+      const path = 'http://10.107.57.85:5000/games/' + this.gameId;
       axios.get(path, {
         params: {
           gameId: this.gameId,
@@ -48,8 +47,7 @@ export default {
         });
     },
     updateScore(team, value) {
-      //const path = 'http://10.107.57.85:5000/scoreboard';
-      const path = 'http://localhost:5001/games/' + this.gameId;
+      const path = 'http://10.107.57.85:5000/games/' + this.gameId;
       const payload = {
         "score_1": this.score_1,
         "score_2": this.score_2,

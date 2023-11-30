@@ -14,8 +14,7 @@ for variable, value in os.environ.items():
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
 
-#client = MongoClient(app.config['SB_DATABASE_HOST'], int(app.config['SB_DATABASE_PORT']))
-client = MongoClient('mongodb://localhost:27017/')
+client = MongoClient(app.config['SB_DATABASE_HOST'], int(app.config['SB_DATABASE_PORT']))
 
 db = client.flask_db
 games = db.games

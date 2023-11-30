@@ -39,7 +39,7 @@ export default {
     },
     methods: {
         getGames() {
-            const path = 'http://localhost:5001/games';
+            const path = 'http://10.107.57.85:5000/games';
             axios.get(path)
                 .then((res) => {
                     this.games = res.data;
@@ -49,8 +49,7 @@ export default {
                 });
         },
         newGame() {
-            // create new game and add to database. Go to game page
-            const path = 'http://localhost:5001/games';
+            const path = 'http://10.107.57.85:5000/games';
             axios.post(path)
                 .then((res) => {
                     this.$router.push({ name: 'scoreboard', params: { gameId: res.data.gameId } });
