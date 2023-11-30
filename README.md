@@ -1,5 +1,7 @@
 # ScoreBoard
 
+Start minikube tunnel with `minikube start` and `minikube tunnel`
+
 Start the application with `kubectl apply -f kustomize.yaml`. 
 
 Access via `http://10.107.57.82/`.
